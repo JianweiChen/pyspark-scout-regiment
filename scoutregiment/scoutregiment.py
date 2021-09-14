@@ -29,19 +29,23 @@ from pyspark.sql import functions as fn
 from pyspark.sql.functions import expr as sql_
 from pyspark.sql.types import *
 
-_erwin = "erwin"
-_hange = "hange"
-_levi = "levi"
-_armin = "armin"
+class ScoutOption(object):
+    _erwin = "erwin"
+    _hange = "hange"
+    _levi = "levi"
+    _armin = "armin"
+    def __init__(option):
 
-scout_leader = _levi
-
+        option.scout_leader = ScoutOption._levi
+        option.scout_member_pattern = "^.*$"
+        option.scout_level = 1
+option = ScoutOption()
 
 scout_rich_console = rich.console.Console(style="magenta")
 
 def _scout_doc(obj):
     docstring = doctest.script_from_examples(obj.__doc__)
-    if scout_leader.lower() == _levi:
+    if option.scout_leader.lower() == ScoutOption._levi:
         docstring = '\n'.join([_ for _ in docstring.split("\n") if not _.startswith("#")])
     docstring_in_syntax = rich.syntax.Syntax(docstring, "python", theme='inkpot')
     scout_rich_console.print(docstring_in_syntax)
@@ -63,7 +67,7 @@ def _is_one_line_doc(line):
     return _is_single_quota_one_line_doc(line) or _is_double_quota_one_line_doc(line)
 
 def _scout_source(obj):
-    if scout_leader.lower() != _armin:
+    if option.scout_leader.lower() != ScoutOption._armin:
         return 
     drop = False
     lines = []
@@ -82,18 +86,27 @@ def _scout_by_dir(obj):
     for _m in dir(obj):
         if _m.startswith("__"):
             pass
-        elif re.findall(scout_member_pattern, _m):
+        elif re.findall(option.scout_member_pattern, _m):
             _scout_member(_m, getattr(obj, _m))
     
 
 def _scout_member(_m, _o):
-    print(colored(_m, "green"))
+    if _o is None:
+        return
+    print(colored(_m, "green", attrs=['bold']))
     print(colored(type(_o), 'blue'))
     scout(_o)
 
 def scout(obj):
+    option.scout_level
+    if option.scout_level <= 0:
+        return
+    if obj is None:
+        return 
     print(colored(obj, 'red'))
+    option.scout_level -= 1
     _scout(obj)
+    option.scout_level += 1
 
 @functools.singledispatch
 def _scout(obj):
@@ -120,6 +133,6 @@ def _(obj):
     _scout_source(obj)
 
 
-scout_leader = _levi
-scout_member_pattern = "^a.*$"
+# option.scout_leader = ScoutOption._levi
+# option.scout_member_pattern = "^e.*$"
 scout(pd.DataFrame)
