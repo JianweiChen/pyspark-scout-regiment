@@ -1,7 +1,7 @@
 import setuptools
 setuptools.setup(
     name='pyspark-scout-regiment',
-    version='v0.0.4',
+    version='v0.0.12',
     description='pyspark scout regiment',
     py_modules=['scoutregiment'],
     author='chenjianwei',
